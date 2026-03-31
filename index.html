@@ -141,6 +141,21 @@ footer{background:#0e1b2b;color:rgba(168,218,220,.6);text-align:center;padding:1
 .cursor{display:inline-block;width:3px;height:1em;background:var(--red);margin-left:3px;vertical-align:middle;animation:blink .7s step-end infinite;}
 @keyframes blink{50%{opacity:0;}}
 
+/* ── PERSONAL SECTION ── */
+.personal{background:#fff;}
+.personal-grid{display:grid;grid-template-columns:1fr 1.4fr;gap:4rem;align-items:start;}
+.personal-photo-col{display:flex;flex-direction:column;align-items:center;gap:1.2rem;}
+.main-photo{width:100%;max-width:320px;border-radius:20px;object-fit:cover;aspect-ratio:3/4;border:3px solid var(--frost);display:block;}
+.photo-caption{font-size:.8rem;color:var(--steel);text-align:center;font-style:italic;}
+.personal-content h3{font-size:1.3rem;font-weight:700;color:var(--deep);margin-bottom:1rem;}
+.personal-content p{font-size:.97rem;color:var(--steel);line-height:1.85;margin-bottom:1rem;}
+.hobbies-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1.5rem;}
+.hobby-card{border-radius:14px;overflow:hidden;position:relative;aspect-ratio:4/3;cursor:default;}
+.hobby-card img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s;}
+.hobby-card:hover img{transform:scale(1.06);}
+.hobby-overlay{position:absolute;bottom:0;left:0;right:0;padding:.6rem .9rem;background:linear-gradient(transparent,rgba(29,53,87,.75));color:#fff;}
+.hobby-label{font-size:.78rem;font-weight:700;letter-spacing:.06em;}
+
 /* FADE-IN */
 .fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
 .fade-in.visible{opacity:1;transform:none;}
@@ -166,6 +181,7 @@ footer{background:#0e1b2b;color:rgba(168,218,220,.6);text-align:center;padding:1
     <li><a href="#skills">Skills</a></li>
     <li><a href="#projects">Projects</a></li>
     <li><a href="#experience">Experience</a></li>
+    <li><a href="#personal">About</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
 </nav>
@@ -375,6 +391,44 @@ footer{background:#0e1b2b;color:rgba(168,218,220,.6);text-align:center;padding:1
         <li>Analyzed EV sensor data with SQL & Python to enhance hardware efficiency decisions.</li>
         <li>Applied MATLAB for system modeling in a fast-paced startup environment.</li>
       </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PERSONAL -->
+<section class="section personal fade-in" id="personal">
+  <div class="s-label"><span></span><p>More About Me</p></div>
+  <h2 class="s-title">Beyond the code</h2>
+  <div class="personal-grid">
+    <div class="personal-photo-col">
+      <img class="main-photo"
+        src="https://raw.githubusercontent.com/SrushtiBPatil/SrushtiBPatil.github.io/main/WhatsApp%20Image%202025-10-08%20at%2012.44.15%20(1).jpeg"
+        alt="Srushti Patil" />
+      <p class="photo-caption">Srushti Patil · Boston, MA</p>
+    </div>
+    <div class="personal-content">
+      <h3>Hi, I'm more than just my tech stack 🌸</h3>
+      <p>I'm a curious, driven person who finds joy in both the precision of building intelligent systems and the softness of everyday beautiful things. Whether I'm architecting an MCP server at work or wandering through a flower market on a Saturday morning — I bring the same attention and care to everything.</p>
+      <p>I moved from India to Boston to chase big dreams in AI and machine learning, and Boston has given me so much in return — incredible seasons, cozy cafes, and a community of people who love to build things.</p>
+      <p>When I'm not deep in code, you'll find me chasing the golden hour, cradling a warm cup of coffee, or hunting for the most charming little café in the city.</p>
+      <div class="hobbies-grid">
+        <div class="hobby-card">
+          <img src="https://raw.githubusercontent.com/SrushtiBPatil/SrushtiBPatil.github.io/main/WhatsApp%20Image%202026-03-31%20at%2013.56.12%20(2).jpeg" alt="Flowers" />
+          <div class="hobby-overlay"><span class="hobby-label">🌸 Flowers & nature</span></div>
+        </div>
+        <div class="hobby-card">
+          <img src="https://raw.githubusercontent.com/SrushtiBPatil/SrushtiBPatil.github.io/main/WhatsApp%20Image%202026-03-31%20at%2013.56.12%20(3).jpeg" alt="Cafes & city" />
+          <div class="hobby-overlay"><span class="hobby-label">🏙️ Cafes & city life</span></div>
+        </div>
+        <div class="hobby-card">
+          <img src="https://raw.githubusercontent.com/SrushtiBPatil/SrushtiBPatil.github.io/main/WhatsApp%20Image%202026-03-31%20at%2013.56.12%20(4).jpeg" alt="Coffee" />
+          <div class="hobby-overlay"><span class="hobby-label">☕ Coffee lover</span></div>
+        </div>
+        <div class="hobby-card">
+          <img src="https://raw.githubusercontent.com/SrushtiBPatil/SrushtiBPatil.github.io/main/WhatsApp%20Image%202026-03-31%20at%2013.56.12.jpeg" alt="Spring & summer" />
+          <div class="hobby-overlay"><span class="hobby-label">🌞 Spring & summer</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

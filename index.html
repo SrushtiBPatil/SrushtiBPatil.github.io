@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Srushti Patil</title>
+<style>
+:root{--red:#E63946;--honeydew:#F1FAEE;--frost:#A8DADC;--steel:#457B9D;--deep:#1D3557;}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--honeydew);color:var(--deep);overflow-x:hidden;}
+
+/* ── CANVAS BG ── */
+#bgCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;width:100%;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:1.1rem 3.5rem;background:rgba(241,250,238,0.82);backdrop-filter:blur(10px);border-bottom:1px solid rgba(168,218,220,0.4);}
+.logo{font-size:1.3rem;font-weight:700;color:var(--deep);letter-spacing:-0.02em;}
+.logo em{color:var(--red);font-style:normal;}
+nav ul{list-style:none;display:flex;gap:2.5rem;}
+nav a{text-decoration:none;font-size:0.85rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--steel);transition:color .2s;}
+nav a:hover{color:var(--red);}
+
+/* ── SECTIONS WRAPPER ── */
+.page{position:relative;z-index:1;}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;align-items:center;padding:8rem 3.5rem 4rem;gap:4rem;}
+.hero-left{flex:1;max-width:640px;}
+.hero-eyebrow{display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem;}
+.eyebrow-line{width:40px;height:2px;background:var(--red);}
+.eyebrow-text{font-size:0.75rem;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--steel);}
+.hero h1{font-size:clamp(3rem,6vw,6rem);font-weight:800;line-height:1;color:var(--deep);letter-spacing:-0.03em;}
+.hero h1 .name-highlight{color:var(--red);display:block;}
+.hero-role{margin-top:1rem;font-size:1.15rem;color:var(--steel);font-weight:400;}
+.hero-role strong{color:var(--deep);font-weight:700;}
+.hero-desc{margin-top:1.25rem;font-size:1rem;color:var(--steel);line-height:1.8;max-width:500px;}
+.hero-chips{display:flex;flex-wrap:wrap;gap:0.6rem;margin-top:1.5rem;}
+.chip{font-size:0.75rem;font-weight:600;padding:.35rem .9rem;border-radius:999px;border:1.5px solid var(--frost);color:var(--steel);background:rgba(168,218,220,0.15);letter-spacing:0.04em;}
+.hero-cta{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;}
+.btn-solid{background:var(--deep);color:var(--honeydew);padding:.8rem 2rem;border-radius:6px;text-decoration:none;font-weight:700;font-size:.9rem;letter-spacing:.04em;transition:background .2s,transform .15s;}
+.btn-solid:hover{background:var(--red);transform:translateY(-2px);}
+.btn-ghost{border:2px solid var(--deep);color:var(--deep);padding:.75rem 1.8rem;border-radius:6px;text-decoration:none;font-weight:700;font-size:.9rem;letter-spacing:.04em;transition:all .2s;}
+.btn-ghost:hover{background:var(--deep);color:var(--honeydew);}
+.hero-right{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:1.5rem;}
+.orb{width:260px;height:260px;border-radius:50%;background:conic-gradient(var(--frost),var(--steel),var(--deep),var(--red),var(--frost));display:flex;align-items:center;justify-content:center;animation:spin 14s linear infinite;}
+.orb-inner{width:230px;height:230px;border-radius:50%;background:var(--honeydew);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.3rem;}
+.orb-initials{font-size:3.5rem;font-weight:800;color:var(--deep);line-height:1;}
+.orb-sub{font-size:0.7rem;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:var(--steel);}
+@keyframes spin{to{transform:rotate(360deg);}}
+.stat-pills{display:flex;flex-direction:column;gap:.6rem;}
+.stat-pill{background:#fff;border:1px solid var(--frost);border-radius:10px;padding:.6rem 1.1rem;display:flex;align-items:center;gap:.75rem;min-width:200px;}
+.stat-num{font-size:1.3rem;font-weight:800;color:var(--red);}
+.stat-lbl{font-size:.78rem;color:var(--steel);line-height:1.3;}
+
+/* ── SHARED ── */
+.section{padding:6rem 3.5rem;position:relative;}
+.section-alt{background:rgba(255,255,255,0.6);}
+.s-label{display:flex;align-items:center;gap:.75rem;margin-bottom:.6rem;}
+.s-label span{width:32px;height:2px;background:var(--red);}
+.s-label p{font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--red);}
+.s-title{font-size:2.4rem;font-weight:800;color:var(--deep);letter-spacing:-.02em;margin-bottom:3rem;}
+
+/* ── ABOUT ── */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;}
+.about-text p{font-size:1rem;color:var(--steel);line-height:1.9;margin-bottom:1rem;}
+.about-text .highlight{color:var(--red);font-weight:700;}
+.about-metrics{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;}
+.metric{background:#fff;border-radius:12px;padding:1.4rem;border-bottom:3px solid var(--red);text-align:center;}
+.metric-num{font-size:2.2rem;font-weight:800;color:var(--deep);}
+.metric-desc{font-size:.8rem;color:var(--steel);margin-top:.3rem;line-height:1.4;}
+
+/* ── SKILLS ── */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1.5rem;}
+.skill-card{background:#fff;border-radius:14px;padding:1.6rem;border:1px solid rgba(168,218,220,0.5);transition:transform .2s,box-shadow .2s;}
+.skill-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(29,53,87,.08);}
+.skill-icon{font-size:1.8rem;margin-bottom:.8rem;}
+.skill-name{font-size:.95rem;font-weight:700;color:var(--deep);margin-bottom:.75rem;}
+.tags{display:flex;flex-wrap:wrap;gap:.45rem;}
+.tag{font-size:.72rem;font-weight:500;background:var(--honeydew);color:var(--steel);border:1px solid var(--frost);padding:.22rem .65rem;border-radius:20px;}
+
+/* ── PROJECTS ── */
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;}
+.proj-card{background:#fff;border-radius:16px;border:1px solid rgba(168,218,220,0.5);overflow:hidden;transition:transform .2s,box-shadow .2s;}
+.proj-card:hover{transform:translateY(-8px);box-shadow:0 20px 50px rgba(29,53,87,.1);}
+.proj-banner{height:130px;display:flex;align-items:center;justify-content:flex-start;padding:0 1.5rem;gap:1rem;position:relative;overflow:hidden;}
+.proj-banner-1{background:var(--deep);}
+.proj-banner-2{background:var(--steel);}
+.proj-banner-3{background:#2e6a8e;}
+.proj-emoji{font-size:2.5rem;}
+.proj-tag-top{font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--frost);position:absolute;bottom:.8rem;right:1rem;}
+.proj-body{padding:1.5rem;}
+.proj-type{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;}
+.proj-body h3{font-size:1.05rem;font-weight:700;color:var(--deep);margin-bottom:.5rem;}
+.proj-body p{font-size:.87rem;color:var(--steel);line-height:1.7;margin-bottom:1rem;}
+.proj-footer{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem;}
+.ptags{display:flex;flex-wrap:wrap;gap:.4rem;}
+.ptag{font-size:.7rem;background:var(--honeydew);color:var(--deep);border:1px solid var(--frost);padding:.18rem .55rem;border-radius:20px;}
+.proj-date{font-size:.72rem;color:var(--steel);font-weight:500;}
+
+/* ── EXPERIENCE ── */
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;}
+.exp-card{background:#fff;border-radius:16px;padding:2rem;border:1px solid rgba(168,218,220,.5);position:relative;overflow:hidden;}
+.exp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red),var(--steel));}
+.exp-card .badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.3rem .8rem;border-radius:20px;background:rgba(230,57,70,.1);color:var(--red);margin-bottom:.8rem;}
+.exp-card h3{font-size:1.05rem;font-weight:700;color:var(--deep);}
+.exp-card .company{font-size:.9rem;color:var(--steel);margin-top:.25rem;}
+.exp-card .period{font-size:.75rem;font-weight:700;color:var(--red);margin-top:.3rem;letter-spacing:.05em;}
+.exp-card ul{margin-top:.85rem;padding-left:1.2rem;}
+.exp-card ul li{font-size:.87rem;color:var(--steel);line-height:1.75;margin-bottom:.25rem;}
+
+/* ── EDUCATION ── */
+.edu-row{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.edu-card{background:#fff;border-radius:16px;padding:2rem;border:1px solid rgba(168,218,220,.5);border-left:4px solid var(--steel);}
+.edu-degree{font-size:1rem;font-weight:700;color:var(--deep);}
+.edu-school{font-size:.9rem;color:var(--steel);margin-top:.3rem;}
+.edu-year{font-size:.78rem;font-weight:700;color:var(--red);margin-top:.35rem;}
+.edu-gpa{font-size:.85rem;color:var(--steel);margin-top:.25rem;}
+.edu-courses{font-size:.78rem;color:var(--steel);margin-top:.6rem;line-height:1.7;}
+
+/* ── CERTIFICATIONS ── */
+.cert-row{display:flex;gap:1.5rem;flex-wrap:wrap;margin-top:0;}
+.cert-card{background:#fff;border-radius:12px;padding:1.2rem 1.5rem;border:1px solid var(--frost);display:flex;align-items:center;gap:.9rem;}
+.cert-icon{font-size:1.6rem;}
+.cert-name{font-size:.9rem;font-weight:600;color:var(--deep);}
+.cert-body{font-size:.78rem;color:var(--steel);margin-top:.1rem;}
+
+/* ── CONTACT ── */
+.contact-section{background:var(--deep);color:var(--honeydew);text-align:center;padding:6rem 3.5rem;}
+.contact-section .s-label{justify-content:center;}
+.contact-section .s-label span{background:var(--frost);}
+.contact-section .s-label p{color:var(--frost);}
+.contact-section .s-title{color:var(--honeydew);text-align:center;}
+.contact-section p.sub{color:var(--frost);font-size:1rem;max-width:480px;margin:0 auto 2.5rem;line-height:1.8;}
+.contact-links{display:flex;justify-content:center;gap:1.2rem;flex-wrap:wrap;}
+.c-link{display:inline-flex;align-items:center;gap:.5rem;background:rgba(168,218,220,.12);border:1.5px solid rgba(168,218,220,.5);color:var(--honeydew);text-decoration:none;padding:.7rem 1.6rem;border-radius:8px;font-weight:600;font-size:.9rem;transition:all .2s;}
+.c-link:hover{background:rgba(168,218,220,.28);transform:translateY(-2px);}
+footer{background:#0e1b2b;color:rgba(168,218,220,.6);text-align:center;padding:1.4rem;font-size:.8rem;}
+
+/* ── TYPING CURSOR ── */
+.cursor{display:inline-block;width:3px;height:1em;background:var(--red);margin-left:3px;vertical-align:middle;animation:blink .7s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+/* FADE-IN */
+.fade-in{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.fade-in.visible{opacity:1;transform:none;}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem;}
+  nav ul{gap:1rem;}
+  .hero{flex-direction:column;padding:7rem 1.5rem 3rem;gap:2rem;}
+  .hero-right{flex-direction:row;flex-wrap:wrap;justify-content:center;}
+  .about-grid,.exp-grid,.edu-row{grid-template-columns:1fr;}
+  .section{padding:4rem 1.5rem;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <div class="logo">S<em>.</em>Patil</div>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <div class="eyebrow-line"></div>
+      <span class="eyebrow-text">AI Engineer · Boston, MA</span>
+    </div>
+    <h1>
+      Hi, I'm
+      <span class="name-highlight">Srushti Patil</span>
+    </h1>
+    <p class="hero-role">
+      <strong id="typed-role"></strong><span class="cursor"></span>
+    </p>
+    <p class="hero-desc">
+      I build intelligent systems where AI meets real-world infrastructure — from agentic LLM pipelines to blockchain bridges and real-time data engines.
+    </p>
+    <div class="hero-chips">
+      <span class="chip">Agentic AI</span>
+      <span class="chip">RAG Pipelines</span>
+      <span class="chip">MCP Servers</span>
+      <span class="chip">Apache Spark</span>
+      <span class="chip">Blockchain</span>
+      <span class="chip">GPA 3.85</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-solid">See My Work →</a>
+      <a href="#contact" class="btn-ghost">Contact Me</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="orb">
+      <div class="orb-inner">
+        <span class="orb-initials">SP</span>
+        <span class="orb-sub">AI Engineer</span>
+      </div>
+    </div>
+    <div class="stat-pills">
+      <div class="stat-pill">
+        <span class="stat-num">30%</span>
+        <span class="stat-lbl">Hallucination reduced<br>via RAG pipeline</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-num">14%</span>
+        <span class="stat-lbl">EV battery range<br>improved with NN</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-num">1M+</span>
+        <span class="stat-lbl">Rows processed<br>with Spark SQL</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="section section-alt fade-in" id="about">
+  <div class="s-label"><span></span><p>About Me</p></div>
+  <h2 class="s-title">Where intelligence meets infrastructure</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm a <span class="highlight">Masters student in Applied Machine Intelligence</span> at Northeastern University (GPA 3.85), currently working as an AI Engineer Co-op at <span class="highlight">Geode Blockchain</span> — where I architect AI agents that securely interface with live blockchain data.</p>
+      <p>My work sits at the intersection of <span class="highlight">agentic AI, data engineering, and decentralized systems</span>. I design RAG pipelines, anomaly detectors, and MCP server architectures that are production-ready — secure, observable, and robust under scale.</p>
+      <p>Before Northeastern, I spent time at a fast-paced EV startup in India, using neural networks to optimize battery hardware — where I learned to move fast and care deeply about correctness.</p>
+    </div>
+    <div class="about-metrics">
+      <div class="metric"><div class="metric-num">3.85</div><div class="metric-desc">GPA at Northeastern University</div></div>
+      <div class="metric"><div class="metric-num">30%</div><div class="metric-desc">Hallucination cut via RAG grounding</div></div>
+      <div class="metric"><div class="metric-num">14%</div><div class="metric-desc">EV battery efficiency gained</div></div>
+      <div class="metric"><div class="metric-num">1M+</div><div class="metric-desc">Data rows processed with Spark</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section class="section fade-in" id="skills">
+  <div class="s-label"><span></span><p>Expertise</p></div>
+  <h2 class="s-title">Technical skills</h2>
+  <div class="skills-grid">
+    <div class="skill-card">
+      <div class="skill-icon">🤖</div>
+      <div class="skill-name">AI & Agents</div>
+      <div class="tags">
+        <span class="tag">LangChain</span><span class="tag">RAG Pipelines</span>
+        <span class="tag">MCP</span><span class="tag">LLM Benchmarking</span>
+        <span class="tag">NLP / Transformers</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">🧠</div>
+      <div class="skill-name">Machine Learning</div>
+      <div class="tags">
+        <span class="tag">Scikit-learn</span><span class="tag">TensorFlow</span>
+        <span class="tag">PyTorch</span><span class="tag">Anomaly Detection</span>
+        <span class="tag">Predictive Modeling</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">⚡</div>
+      <div class="skill-name">Data Engineering</div>
+      <div class="tags">
+        <span class="tag">Apache Spark</span><span class="tag">SQL</span>
+        <span class="tag">ETL Pipelines</span><span class="tag">Big Data</span>
+        <span class="tag">JSON Structuring</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">💻</div>
+      <div class="skill-name">Programming</div>
+      <div class="tags">
+        <span class="tag">Python</span><span class="tag">TypeScript</span>
+        <span class="tag">Node.js</span><span class="tag">React</span>
+        <span class="tag">MATLAB</span><span class="tag">Git</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-icon">☁️</div>
+      <div class="skill-name">Cloud & Deployment</div>
+      <div class="tags">
+        <span class="tag">AWS</span><span class="tag">Google Cloud</span>
+        <span class="tag">HPC</span><span class="tag">Secure API</span>
+        <span class="tag">System Monitoring</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section class="section section-alt fade-in" id="projects">
+  <div class="s-label"><span></span><p>Selected Work</p></div>
+  <h2 class="s-title">Projects</h2>
+  <div class="projects-grid">
+    <div class="proj-card">
+      <div class="proj-banner proj-banner-1">
+        <span class="proj-emoji">🔗</span>
+        <span class="proj-tag-top">Feb 2026 – Present</span>
+      </div>
+      <div class="proj-body">
+        <p class="proj-type">Blockchain · Full-Stack</p>
+        <h3>Decentralized Survey & Analytics System</h3>
+        <p>Full-stack system with account-gating, secure signing modals, and automated validation handlers that monitor and flag abnormal submission patterns — mirroring e-commerce risk control protocols.</p>
+        <div class="proj-footer">
+          <div class="ptags"><span class="ptag">Node.js</span><span class="ptag">React</span><span class="ptag">Blockchain</span><span class="ptag">Risk Control</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-banner proj-banner-2">
+        <span class="proj-emoji">🧩</span>
+        <span class="proj-tag-top">Jan – Feb 2026</span>
+      </div>
+      <div class="proj-body">
+        <p class="proj-type">Agentic AI · Infrastructure</p>
+        <h3>AI User Agent & MCP Infrastructure</h3>
+        <p>Engineered MCP servers bridging LLMs with live blockchain data. RAG pipelines reduced hallucination by 30%. Optimized Polkadot.js-compatible transaction payload generation with reduced API latency.</p>
+        <div class="proj-footer">
+          <div class="ptags"><span class="ptag">LangChain</span><span class="ptag">RAG</span><span class="ptag">MCP</span><span class="ptag">Polkadot.js</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-banner proj-banner-3">
+        <span class="proj-emoji">📊</span>
+        <span class="proj-tag-top">Oct – Dec 2025</span>
+      </div>
+      <div class="proj-body">
+        <p class="proj-type">Data Engineering · ML</p>
+        <h3>Scalable Anomaly Detection with Spark SQL</h3>
+        <p>Processed 1M+ rows of climate data with Apache Spark. Automated outlier detection using Z-Score and Isolation Forest, evaluated by false-positive rates for high-volume environment reliability.</p>
+        <div class="proj-footer">
+          <div class="ptags"><span class="ptag">Apache Spark</span><span class="ptag">SQL</span><span class="ptag">Isolation Forest</span><span class="ptag">Z-Score</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="section fade-in" id="experience">
+  <div class="s-label"><span></span><p>Career</p></div>
+  <h2 class="s-title">Work experience</h2>
+  <div class="exp-grid">
+    <div class="exp-card">
+      <span class="badge">Current Role</span>
+      <h3>AI Engineer Co-op</h3>
+      <div class="company">Geode Blockchain — USA</div>
+      <div class="period">Jan 2026 – Present</div>
+      <ul>
+        <li>Building AI User Agents with secure tool-use for privacy-safe data retrieval.</li>
+        <li>Implementing anomaly detection within RAG pipelines to catch inconsistent outputs.</li>
+        <li>Engineering MCP Servers bridging LLMs with blockchain data and account-gated auth.</li>
+        <li>Architecting automated pipelines for predictive modeling in protocol governance.</li>
+      </ul>
+    </div>
+    <div class="exp-card">
+      <span class="badge">Internship</span>
+      <h3>Machine Learning Intern</h3>
+      <div class="company">MovEV Mobility Pvt. Ltd. — India</div>
+      <div class="period">Jan 2023 – Apr 2023</div>
+      <ul>
+        <li>Designed EV harness layouts with TensorFlow & PyTorch — improved battery range by 14%.</li>
+        <li>Analyzed EV sensor data with SQL & Python to enhance hardware efficiency decisions.</li>
+        <li>Applied MATLAB for system modeling in a fast-paced startup environment.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section class="section section-alt fade-in" id="education">
+  <div class="s-label"><span></span><p>Academic Background</p></div>
+  <h2 class="s-title">Education</h2>
+  <div class="edu-row">
+    <div class="edu-card">
+      <div class="edu-degree">Masters in Applied Machine Intelligence</div>
+      <div class="edu-school">Northeastern University, Boston, MA</div>
+      <div class="edu-gpa">GPA: 3.85 / 4.0</div>
+      <div class="edu-year">Expected Dec 2026</div>
+      <div class="edu-courses">Machine Learning · Database Management · Artificial Intelligence · Financial Mathematics · Data Analysis</div>
+    </div>
+    <div class="edu-card">
+      <div class="edu-degree">Bachelor of Engineering — Electronics & Communication</div>
+      <div class="edu-school">Gogte Institute of Technology, Belgaum, India</div>
+      <div class="edu-year">June 2024</div>
+    </div>
+  </div>
+  <div style="margin-top:2rem;">
+    <div class="s-label" style="margin-bottom:1.2rem;"><span></span><p>Certifications</p></div>
+    <div class="cert-row">
+      <div class="cert-card">
+        <span class="cert-icon">🏅</span>
+        <div><div class="cert-name">Graduate Leadership Institute Badge</div><div class="cert-body">Leadership, teamwork & growth recognition</div></div>
+      </div>
+      <div class="cert-card">
+        <span class="cert-icon">🤖</span>
+        <div><div class="cert-name">AI in the Workplace</div><div class="cert-body">Strategic AI application & collaboration</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section fade-in" id="contact">
+  <div class="s-label"><span></span><p>Let's Connect</p></div>
+  <h2 class="s-title">Get in touch</h2>
+  <p class="sub">Open to full-time roles, research collaborations, and interesting projects in AI engineering, data systems, and blockchain infrastructure.</p>
+  <div class="contact-links">
+    <a href="mailto:patil.srus@northeastern.edu" class="c-link">✉ patil.srus@northeastern.edu</a>
+    <a href="https://srushtipatil.com" class="c-link" target="_blank">🌐 srushtipatil.com</a>
+    <a href="#" class="c-link">LinkedIn</a>
+    <a href="#" class="c-link">GitHub</a>
+  </div>
+</section>
+
+<footer>© 2026 Srushti Patil · Boston, MA · +1-857-421-9001</footer>
+
+</div>
+
+<script>
+/* ── ANIMATED BACKGROUND CANVAS ── */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [], lines = [];
+
+const COLORS = ['#A8DADC','#457B9D','#1D3557','#E63946'];
+
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+class Particle {
+  constructor(){this.reset(true);}
+  reset(init){
+    this.x = Math.random()*W;
+    this.y = init ? Math.random()*H : H+10;
+    this.r = Math.random()*2.5+1;
+    this.vx = (Math.random()-.5)*.4;
+    this.vy = -(Math.random()*.6+.2);
+    this.alpha = Math.random()*.35+.08;
+    this.color = COLORS[Math.floor(Math.random()*COLORS.length)];
+  }
+  update(){
+    this.x+=this.vx; this.y+=this.vy;
+    if(this.y<-10)this.reset(false);
+    if(this.x<0||this.x>W)this.vx*=-1;
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.r,0,Math.PI*2);
+    ctx.fillStyle = this.color;
+    ctx.globalAlpha = this.alpha;
+    ctx.fill();
+  }
+}
+
+function initParticles(){
+  particles=[];
+  for(let i=0;i<90;i++) particles.push(new Particle());
+}
+
+let t=0;
+function drawWave(){
+  ctx.globalAlpha=0.04;
+  for(let w=0;w<3;w++){
+    ctx.beginPath();
+    const amp=28+w*12, freq=0.004+w*0.002, spd=0.008+w*0.003;
+    ctx.moveTo(0,H*.5);
+    for(let x=0;x<=W;x+=4){
+      const y = H*.38 + w*H*.12 + Math.sin(x*freq + t*(spd) + w*1.2)*amp;
+      ctx.lineTo(x,y);
+    }
+    ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+    ctx.fillStyle=COLORS[w+1];
+    ctx.fill();
+  }
+}
+
+function connectParticles(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.globalAlpha=(1-dist/100)*0.06;
+        ctx.strokeStyle='#457B9D';
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  t++;
+  drawWave();
+  connectParticles();
+  particles.forEach(p=>{p.update();p.draw();});
+  ctx.globalAlpha=1;
+  requestAnimationFrame(animate);
+}
+
+resize();
+initParticles();
+animate();
+window.addEventListener('resize',()=>{resize();initParticles();});
+
+/* ── TYPING EFFECT ── */
+const roles = [
+  'AI Engineer Co-op @ Geode Blockchain',
+  'Applied Machine Intelligence @ NEU',
+  'RAG & Agentic Systems Builder',
+  'Data Engineer · Blockchain Bridger'
+];
+let ri=0,ci=0,deleting=false;
+const el=document.getElementById('typed-role');
+function type(){
+  const cur=roles[ri];
+  if(!deleting){
+    el.textContent=cur.slice(0,ci+1);
+    ci++;
+    if(ci===cur.length){setTimeout(()=>{deleting=true;},1800);setTimeout(type,60);return;}
+  } else {
+    el.textContent=cur.slice(0,ci-1);
+    ci--;
+    if(ci===0){deleting=false;ri=(ri+1)%roles.length;}
+  }
+  setTimeout(type,deleting?40:75);
+}
+type();
+
+/* ── SCROLL FADE-IN ── */
+const obs = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');});
+},{threshold:0.12});
+document.querySelectorAll('.fade-in').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

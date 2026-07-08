@@ -32,23 +32,37 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 @keyframes blink-dot{0%,100%{opacity:1;}50%{opacity:.2;}}
 
 /* ── HERO ── */
-.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 4rem 4rem;overflow:hidden;}
+.hero{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:8rem 4rem 4rem;gap:4rem;overflow:hidden;}
 .hero-bg-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:clamp(8rem,20vw,22rem);font-weight:900;letter-spacing:-.05em;color:rgba(255,255,255,.03);white-space:nowrap;pointer-events:none;user-select:none;line-height:1;}
-.hero-photo{position:absolute;bottom:0;right:4rem;height:88vh;object-fit:contain;object-position:bottom;pointer-events:none;opacity:.9;filter:grayscale(20%);}
-.hero-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:auto;padding-top:7rem;}
-.hero-tag{font-size:.72rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--frost);border:1px solid rgba(168,218,220,.3);padding:.4rem .9rem;border-radius:4px;}
-.hero-available{display:flex;align-items:center;gap:.5rem;font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
-.hero-content{position:relative;z-index:2;max-width:700px;}
-.hero-eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;}
-.hero h1{font-size:clamp(4rem,8vw,9rem);font-weight:900;line-height:.92;letter-spacing:-.04em;color:var(--white);}
+.hero-left{position:relative;z-index:2;}
+.hero-eyebrow{font-size:.75rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
+.hero-eyebrow::before{content:'';display:inline-block;width:32px;height:2px;background:var(--red);}
+.hero h1{font-size:clamp(4rem,7vw,8rem);font-weight:900;line-height:.92;letter-spacing:-.04em;color:var(--white);}
 .hero h1 .red{color:var(--red);}
-.hero-sub{margin-top:1.5rem;display:flex;align-items:center;gap:2rem;flex-wrap:wrap;}
-.hero-role{font-size:1rem;color:var(--muted);font-weight:400;max-width:340px;line-height:1.6;}
-.hero-role strong{color:var(--white);font-weight:600;}
-.hero-scroll{display:flex;align-items:center;gap:.6rem;font-size:.7rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
-.hero-scroll-line{width:40px;height:1px;background:var(--muted);}
+.hero-role-wrap{margin-top:1.5rem;}
+.hero-role{font-size:1rem;color:var(--frost);min-height:1.4rem;font-weight:500;}
+.hero-tagline{font-size:.95rem;color:var(--muted);margin-top:.5rem;line-height:1.6;max-width:380px;}
+.hero-tagline strong{color:var(--white);font-weight:600;}
+.hero-tags{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.2rem;}
+.hero-tag-chip{font-size:.7rem;font-weight:600;padding:.3rem .8rem;border-radius:3px;border:1px solid rgba(168,218,220,.25);color:var(--frost);background:rgba(168,218,220,.05);}
+.hero-cta-row{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap;}
+.hero-btn{display:inline-flex;align-items:center;gap:.5rem;font-size:.8rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.75rem 1.6rem;border-radius:4px;transition:all .2s;}
+.hero-btn-solid{background:var(--white);color:var(--bg);}
+.hero-btn-solid:hover{background:var(--red);color:var(--white);}
+.hero-btn-ghost{border:1px solid rgba(255,255,255,.2);color:var(--white);}
+.hero-btn-ghost:hover{border-color:var(--white);background:rgba(255,255,255,.06);}
+.hero-right{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;}
+.hero-photo-frame{position:relative;width:100%;max-width:440px;}
+.hero-photo{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center top;border-radius:8px;display:block;border:1px solid var(--border);}
+.hero-available{position:absolute;bottom:-1rem;left:-1rem;display:flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--bg);border:1px solid var(--border);color:var(--muted);padding:.5rem 1rem;border-radius:4px;}
+.hero-scroll{position:absolute;bottom:2rem;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:.6rem;font-size:.68rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);z-index:2;}
+.hero-scroll-line{width:36px;height:1px;background:var(--muted);}
 
-/* ── DIVIDER ── */
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;padding:7rem 1.5rem 3rem;gap:2rem;}
+  .hero-right{justify-content:flex-start;}
+  .hero-photo-frame{max-width:280px;}
+}
 .divider{border:none;border-top:1px solid var(--border);margin:0;}
 
 /* ── SECTIONS ── */
@@ -188,27 +202,35 @@ footer{background:#000;color:rgba(255,255,255,.2);text-align:center;padding:1.5r
 
 <!-- HERO -->
 <section class="hero" id="home">
-  <div class="hero-bg-text">SRUSHTI</div>
-  <img class="hero-photo"
-    src="https://raw.githubusercontent.com/SrushtiBPatil/SrushtiBPatil.github.io/main/WhatsApp%20Image%202025-10-08%20at%2012.44.15%20(1).jpeg"
-    alt="Srushti Patil"/>
-  <div class="hero-top">
-    <div class="hero-tag">AI Engineer · Boston, MA</div>
-    <div class="hero-available"><div class="nav-dot"></div>Available for full-time roles</div>
-  </div>
-  <div class="hero-content">
+  <div class="hero-bg-text">SP</div>
+  <div class="hero-left">
     <div class="hero-eyebrow">Hello, I'm</div>
     <h1>Srushti<br><span class="red">Patil</span></h1>
-    <div class="hero-sub">
-      <div class="hero-role">
-        <span id="typed-role"></span><span class="cursor"></span><br>
-        <strong>Applied Machine Intelligence @ Northeastern</strong>
-      </div>
-      <div class="hero-scroll">
-        <div class="hero-scroll-line"></div>Scroll to explore
-      </div>
+    <div class="hero-role-wrap">
+      <div class="hero-role"><span id="typed-role"></span><span class="cursor"></span></div>
+      <div class="hero-tagline"><strong>Applied Machine Intelligence @ Northeastern</strong><br>Boston, MA · Actively seeking full-time roles</div>
+    </div>
+    <div class="hero-tags">
+      <span class="hero-tag-chip">Agentic AI</span>
+      <span class="hero-tag-chip">MCP Servers</span>
+      <span class="hero-tag-chip">RAG Pipelines</span>
+      <span class="hero-tag-chip">Full-Stack</span>
+      <span class="hero-tag-chip">Data Engineering</span>
+    </div>
+    <div class="hero-cta-row">
+      <a href="https://github.com/SrushtiBPatil" target="_blank" class="hero-btn hero-btn-solid">See My Work →</a>
+      <a href="#contact" class="hero-btn hero-btn-ghost">Get In Touch</a>
     </div>
   </div>
+  <div class="hero-right">
+    <div class="hero-photo-frame">
+      <img class="hero-photo"
+        src="https://raw.githubusercontent.com/SrushtiBPatil/SrushtiBPatil.github.io/main/WhatsApp%20Image%202025-10-08%20at%2012.44.15%20(1).jpeg"
+        alt="Srushti Patil"/>
+      <div class="hero-available"><div class="nav-dot"></div>Open to Work</div>
+    </div>
+  </div>
+  <div class="hero-scroll"><div class="hero-scroll-line"></div>Scroll to explore</div>
 </section>
 
 <hr class="divider"/>

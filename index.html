@@ -33,8 +33,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content
 /* ── HERO ── */
 .hero{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:8rem 4rem 4rem;gap:4rem;overflow:hidden;}
 .hero-bg-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:var(--font-display);font-style:italic;font-size:clamp(8rem,20vw,22rem);font-weight:600;letter-spacing:-.02em;color:rgba(255,255,255,.03);white-space:nowrap;pointer-events:none;user-select:none;line-height:1;}
-.hero-strands-container{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;background:transparent;}
-.hero-strands-container canvas{display:block;width:100%;height:100%;}
+.hero-rays-container{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none;overflow:hidden;}
+.hero-rays-container canvas{display:block;width:100%;height:100%;}
 .hero-left{position:relative;z-index:2;}
 .hero-eyebrow{font-family:var(--font-display);font-style:italic;font-size:.85rem;font-weight:500;letter-spacing:.08em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.6rem;}
 .hero-eyebrow::before{content:'';display:inline-block;width:32px;height:2px;background:var(--red);}
@@ -187,7 +187,7 @@ footer{background:#000;color:rgba(255,255,255,.2);text-align:center;padding:1.5r
 <!-- HERO -->
 <section class="hero" id="home">
   <div class="hero-bg-text">SP</div>
-  <div class="hero-strands-container" id="heroStrandsContainer"></div>
+  <div class="hero-rays-container" id="heroRaysContainer"></div>
   <div class="hero-left">
     <div class="hero-eyebrow">Hello, I'm</div>
     <h1>Srushti<br><span class="red">Patil</span></h1>
@@ -523,193 +523,151 @@ sEl.addEventListener('mouseenter',scramble);
 new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)scramble();});},{threshold:.5}).observe(sEl);
 </script>
 
-<!-- ── STRANDS (React Bits, ported to vanilla JS/OGL) ── -->
+<!-- ── SIDE RAYS (React Bits, ported to vanilla JS/OGL) ── -->
 <script type="module">
-import { Renderer, Program, Mesh, Color, Triangle } from 'https://esm.sh/ogl@1.0.6';
+import { Renderer, Program, Triangle, Mesh } from 'https://esm.sh/ogl@1.0.6';
 
-const MAX_STRANDS = 12;
-const MAX_COLORS = 8;
+function hexToRgb(hex) {
+  const m = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m ? [parseInt(m[1], 16) / 255, parseInt(m[2], 16) / 255, parseInt(m[3], 16) / 255] : [1, 1, 1];
+}
 
-const VERT = `#version 300 es
-in vec2 position;
+function originToFlip(origin) {
+  switch (origin) {
+    case 'top-left': return [1, 0];
+    case 'bottom-right': return [0, 1];
+    case 'bottom-left': return [1, 1];
+    default: return [0, 0];
+  }
+}
+
+const VERT = `
+attribute vec2 position;
 void main() {
   gl_Position = vec4(position, 0.0, 1.0);
-}
-`;
+}`;
 
-const FRAG = `#version 300 es
-precision highp float;
+const FRAG = `precision highp float;
 
-uniform float uTime;
-uniform vec2 uResolution;
-uniform vec3 uColors[${MAX_COLORS}];
-uniform int uColorCount;
-uniform int uStrandCount;
-uniform float uSpeed;
-uniform float uAmplitude;
-uniform float uWaviness;
-uniform float uThickness;
-uniform float uGlow;
-uniform float uTaper;
-uniform float uSpread;
-uniform float uHueShift;
-uniform float uIntensity;
-uniform float uOpacity;
-uniform float uScale;
-uniform float uSaturation;
+uniform float iTime;
+uniform vec2 iResolution;
+uniform float iSpeed;
+uniform vec3 iRayColor1;
+uniform vec3 iRayColor2;
+uniform float iIntensity;
+uniform float iSpread;
+uniform float iFlipX;
+uniform float iFlipY;
+uniform float iTilt;
+uniform float iSaturation;
+uniform float iBlend;
+uniform float iFalloff;
+uniform float iOpacity;
 
-out vec4 fragColor;
-
-const float PI = 3.14159265;
-
-vec3 spectrum(float t) {
-  return 0.5 + 0.5 * cos(2.0 * PI * (t + vec3(0.00, 0.33, 0.67)));
-}
-
-vec3 samplePalette(float t) {
-  t = fract(t);
-  float scaled = t * float(uColorCount);
-  int idx = int(floor(scaled));
-  float blend = fract(scaled);
-  int nextIdx = idx + 1;
-  if (nextIdx >= uColorCount) nextIdx = 0;
-  return mix(uColors[idx], uColors[nextIdx], blend);
-}
-
-vec3 strandColor(float t) {
-  if (uColorCount > 0) return samplePalette(t);
-  return spectrum(t);
+float rayStrength(vec2 raySource, vec2 rayRefDirection, vec2 coord, float seedA, float seedB, float speed) {
+  vec2 sourceToCoord = coord - raySource;
+  float cosAngle = dot(normalize(sourceToCoord), rayRefDirection);
+  return clamp(
+    (0.45 + 0.15 * sin(cosAngle * seedA + iTime * speed)) +
+    (0.3 + 0.2 * cos(-cosAngle * seedB + iTime * speed)),
+    0.0, 1.0) *
+    clamp((iResolution.x - length(sourceToCoord)) / iResolution.x, 0.5, 1.0);
 }
 
 void main() {
-  vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) / uResolution.y;
-  uv /= max(uScale, 0.0001);
+  vec2 fragCoord = gl_FragCoord.xy;
+  if (iFlipX > 0.5) fragCoord.x = iResolution.x - fragCoord.x;
+  if (iFlipY > 0.5) fragCoord.y = iResolution.y - fragCoord.y;
 
-  float e = 0.06 + uIntensity * 0.94;
-  float env = pow(max(cos(uv.x * PI * 1.3), 0.0), uTaper);
+  vec2 coord = vec2(fragCoord.x, iResolution.y - fragCoord.y);
+  vec2 rayPos = vec2(iResolution.x * 1.1, -0.5 * iResolution.y);
 
-  vec3 col = vec3(0.0);
+  float tiltRad = iTilt * 3.14159265 / 180.0;
+  float cs = cos(tiltRad);
+  float sn = sin(tiltRad);
+  vec2 rel = coord - rayPos;
+  vec2 tiltedCoord = vec2(rel.x * cs - rel.y * sn, rel.x * sn + rel.y * cs) + rayPos;
 
-  for (int i = 0; i < ${MAX_STRANDS}; i++) {
-    if (i >= uStrandCount) break;
+  float halfSpread = iSpread * 0.275;
+  vec2 rayRefDir1 = normalize(vec2(cos(0.785398 + halfSpread), sin(0.785398 + halfSpread)));
+  vec2 rayRefDir2 = normalize(vec2(cos(0.785398 - halfSpread), sin(0.785398 - halfSpread)));
 
-    float fi = float(i);
-    float ph = fi * 1.7 * uSpread;
-    float freq = (2.0 + fi * 0.35) * uWaviness;
-    float spd = 1.4 + fi * 1.2;
+  vec4 rays1 = vec4(iRayColor1, 1.0) * rayStrength(rayPos, rayRefDir1, tiltedCoord, 36.2214, 21.11349, iSpeed);
+  vec4 rays2 = vec4(iRayColor2, 1.0) * rayStrength(rayPos, rayRefDir2, tiltedCoord, 22.3991, 18.0234, iSpeed * 0.2);
 
-    float tt = uTime * uSpeed;
-    float w = sin(uv.x * freq + tt * spd + ph) * 0.60
-            + sin(uv.x * freq * 1.1 - tt * spd * 0.7 + ph * 1.7) * 0.40;
+  vec4 color = rays1 * (1.0 - iBlend) * 0.9 + rays2 * iBlend * 0.9;
 
-    float amp = (0.1 + 0.02 * e) * env * uAmplitude;
-    float y = w * amp;
+  float distanceToLight = length(fragCoord.xy - vec2(rayPos.x, iResolution.y - rayPos.y)) / iResolution.y;
+  float brightness = iIntensity * 0.4 / pow(max(distanceToLight, 0.001), iFalloff);
+  color.rgb *= brightness;
 
-    float d = abs(uv.y - y);
-    float thick = (0.001 + 0.05 * e) * (0.35 + env) * uThickness;
-    float g = thick / (d + thick * 0.45);
-    g = g * g;
+  float gray = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+  color.rgb = mix(vec3(gray), color.rgb, iSaturation);
 
-    float h = fi / float(uStrandCount) + uv.x * 0.30 + uTime * 0.04 + uHueShift;
-    col += strandColor(h) * g * env;
-  }
+  color.a = max(color.r, max(color.g, color.b)) * iOpacity;
+  gl_FragColor = color;
+}`;
 
-  col *= 0.45 + 0.7 * e;
-  col = 1.0 - exp(-col * uGlow);
+function initSideRays(container, opts) {
+  if (!container) return;
 
-  float gray = dot(col, vec3(0.2126, 0.7152, 0.0722));
-  col = max(mix(vec3(gray), col, uSaturation), 0.0);
-
-  float lum = max(max(col.r, col.g), col.b);
-  float alpha = clamp(lum, 0.0, 1.0) * uOpacity;
-
-  fragColor = vec4(col * uOpacity, alpha);
-}
-`;
-
-function buildPalette(colors) {
-  const filled = colors && colors.length ? colors : ['#ffffff'];
-  const padded = [];
-  for (let i = 0; i < MAX_COLORS; i++) {
-    const hex = filled[i] ?? filled[filled.length - 1];
-    const c = new Color(hex);
-    padded.push([c.r, c.g, c.b]);
-  }
-  return padded;
-}
-
-function initStrands(ctn, opts) {
-  if (!ctn) return;
-
-  const renderer = new Renderer({ alpha: true, premultipliedAlpha: true, antialias: true });
+  const renderer = new Renderer({ dpr: Math.min(window.devicePixelRatio, 2), alpha: true });
   const gl = renderer.gl;
-  gl.clearColor(0, 0, 0, 0);
-  gl.enable(gl.BLEND);
-  gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
-  gl.canvas.style.backgroundColor = 'transparent';
+  gl.canvas.style.width = '100%';
+  gl.canvas.style.height = '100%';
+  container.appendChild(gl.canvas);
+
+  const [flipX, flipY] = originToFlip(opts.origin);
+  const uniforms = {
+    iTime: { value: 0 },
+    iResolution: { value: [1, 1] },
+    iSpeed: { value: opts.speed },
+    iRayColor1: { value: hexToRgb(opts.rayColor1) },
+    iRayColor2: { value: hexToRgb(opts.rayColor2) },
+    iIntensity: { value: opts.intensity },
+    iSpread: { value: opts.spread },
+    iFlipX: { value: flipX },
+    iFlipY: { value: flipY },
+    iTilt: { value: opts.tilt },
+    iSaturation: { value: opts.saturation },
+    iBlend: { value: opts.blend },
+    iFalloff: { value: opts.falloff },
+    iOpacity: { value: opts.opacity }
+  };
 
   const geometry = new Triangle(gl);
-  if (geometry.attributes.uv) delete geometry.attributes.uv;
-
-  const program = new Program(gl, {
-    vertex: VERT,
-    fragment: FRAG,
-    uniforms: {
-      uTime: { value: 0 },
-      uResolution: { value: [ctn.offsetWidth, ctn.offsetHeight] },
-      uColors: { value: buildPalette(opts.colors) },
-      uColorCount: { value: Math.min(opts.colors.length, MAX_COLORS) },
-      uStrandCount: { value: Math.min(opts.count, MAX_STRANDS) },
-      uSpeed: { value: opts.speed },
-      uAmplitude: { value: opts.amplitude },
-      uWaviness: { value: opts.waviness },
-      uThickness: { value: opts.thickness },
-      uGlow: { value: opts.glow },
-      uTaper: { value: opts.taper },
-      uSpread: { value: opts.spread },
-      uHueShift: { value: opts.hueShift },
-      uIntensity: { value: opts.intensity },
-      uOpacity: { value: opts.opacity },
-      uScale: { value: opts.scale },
-      uSaturation: { value: opts.saturation }
-    }
-  });
-
+  const program = new Program(gl, { vertex: VERT, fragment: FRAG, uniforms });
   const mesh = new Mesh(gl, { geometry, program });
-  ctn.appendChild(gl.canvas);
 
-  function resize() {
-    const width = ctn.offsetWidth;
-    const height = ctn.offsetHeight;
-    renderer.setSize(width, height);
-    program.uniforms.uResolution.value = [width, height];
+  function updateSize() {
+    renderer.dpr = Math.min(window.devicePixelRatio, 2);
+    const w = container.clientWidth, h = container.clientHeight;
+    renderer.setSize(w, h);
+    uniforms.iResolution.value = [w * renderer.dpr, h * renderer.dpr];
   }
-  window.addEventListener('resize', resize);
-  resize();
+  window.addEventListener('resize', updateSize);
+  updateSize();
 
-  function update(t) {
-    requestAnimationFrame(update);
-    program.uniforms.uTime.value = t * 0.001;
+  function loop(t) {
+    uniforms.iTime.value = t * 0.001;
     renderer.render({ scene: mesh });
+    requestAnimationFrame(loop);
   }
-  requestAnimationFrame(update);
+  requestAnimationFrame(loop);
 }
 
-initStrands(document.getElementById('heroStrandsContainer'), {
-  colors: ['#E63946', '#A8DADC', '#457B9D'],
-  count: 3,
-  speed: 0.35,
-  amplitude: 0.9,
-  waviness: 1,
-  thickness: 0.55,
-  glow: 2.0,
-  taper: 3,
-  spread: 1,
-  hueShift: 0,
-  intensity: 0.5,
+initSideRays(document.getElementById('heroRaysContainer'), {
+  speed: 1.2,
+  rayColor1: '#457B9D',
+  rayColor2: '#E63946',
+  intensity: 1.1,
+  spread: 1.6,
+  origin: 'top-right',
+  tilt: 0,
   saturation: 1.1,
-  opacity: 0.85,
-  scale: 1.6
+  blend: 0.6,
+  falloff: 1.8,
+  opacity: 0.5
 });
 </script>
 </body>
